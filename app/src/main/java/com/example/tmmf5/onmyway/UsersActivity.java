@@ -1,9 +1,11 @@
 package com.example.tmmf5.onmyway;
 
+import android.app.Activity;
+import android.os.AsyncTask;
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
 import android.support.v4.app.Fragment;
@@ -11,6 +13,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,6 +21,19 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.TextView;
+
+import com.example.tmmf5.onmyway.UserList.UserListAdapter;
+import com.example.tmmf5.onmyway.UserList.UserListClickListener;
+import com.example.tmmf5.onmyway.UserList.UsersTask;
+import com.google.android.gms.maps.model.LatLng;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 
 public class UsersActivity extends AppCompatActivity {
 
@@ -54,14 +70,6 @@ public class UsersActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
     }
 
@@ -98,6 +106,10 @@ public class UsersActivity extends AppCompatActivity {
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
 
+        private RecyclerView mRecyclerView;
+        private RecyclerView.Adapter mAdapter;
+        private RecyclerView.LayoutManager mLayoutManager;
+
         public PlaceholderFragment() {
         }
 
@@ -116,12 +128,35 @@ public class UsersActivity extends AppCompatActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
+
             View rootView = inflater.inflate(R.layout.fragment_users, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+            //TextView textView = (TextView) rootView.findViewById(R.id.section_label);
+            //textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+
+            mRecyclerView = (RecyclerView) rootView.findViewById(R.id.users_list);
+
+            mLayoutManager = new LinearLayoutManager(this.getActivity());
+            mRecyclerView.setLayoutManager(mLayoutManager);
+
+            User testUser = new User();
+            testUser.setId(1);
+            testUser.setFirst_name("Tiago");
+            testUser.setLast_name("Ferreira");
+            testUser.setGender("Male");
+            testUser.setPosition(new LatLng(41.182466, -8.598667));
+
+            ArrayList<User> myDataset = new ArrayList<>();
+            myDataset.add(testUser);
+
+            mAdapter = new UserListAdapter(myDataset, mRecyclerView, this.getActivity());
+            mRecyclerView.setAdapter(mAdapter);
+
+            new UsersTask(this.getActivity()).execute();
+
             return rootView;
         }
     }
+
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -150,13 +185,16 @@ public class UsersActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "SECTION 1";
+                    return "ALL USERS";
                 case 1:
-                    return "SECTION 2";
+                    return "FRIENDS";
                 case 2:
-                    return "SECTION 3";
+                    return "CHAT";
             }
             return null;
         }
     }
+
+
+
 }

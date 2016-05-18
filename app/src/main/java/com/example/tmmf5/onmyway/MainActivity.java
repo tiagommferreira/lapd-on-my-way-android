@@ -95,8 +95,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-
-
     }
 
     public void startUsersActivity() {
@@ -132,64 +130,4 @@ public class MainActivity extends AppCompatActivity {
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
-
-
-    class UsersTask extends AsyncTask<Void, Void, String> {
-
-        Activity parent;
-
-        public UsersTask(Activity p) {
-            this.parent = p;
-        }
-
-        protected void onPreExecute() {
-            progressBar.setVisibility(View.VISIBLE);
-            responseTextView.setText("");
-        }
-
-        @Override
-        protected String doInBackground(Void... params) {
-
-            try {
-                URL url = new URL("https://lapd-on-my-way.herokuapp.com/users");
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setReadTimeout(10000);
-                urlConnection.setConnectTimeout(15000);
-                urlConnection.setRequestMethod("GET");
-
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                StringBuilder stringBuilder = new StringBuilder();
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(line).append("\n");
-                }
-                bufferedReader.close();
-
-                return stringBuilder.toString();
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                return null;
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
-
-        }
-
-        protected void onPostExecute(String response) {
-            if(response == null) {
-                response = "THERE WAS AN ERROR";
-            }
-            progressBar.setVisibility(View.GONE);
-            Log.i("INFO", response);
-            responseTextView.setText(response);
-
-            /*
-            Intent intent = new Intent(this.parent, MapsActivity.class);
-            startActivity(intent);
-            */
-        }
-
-    }
 }
