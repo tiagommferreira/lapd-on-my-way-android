@@ -3,6 +3,7 @@ package com.example.tmmf5.onmyway.UserList;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
@@ -26,7 +27,9 @@ public class UserListClickListener implements View.OnClickListener {
     public void onClick(View v) {
         int pos = rv.getChildAdapterPosition(v);
         User user = dataset.get(pos);
+
         Intent intent = new Intent(activity, MapsActivity.class);
+        intent.putExtra("user", user);
         activity.startActivity(intent);
     }
 

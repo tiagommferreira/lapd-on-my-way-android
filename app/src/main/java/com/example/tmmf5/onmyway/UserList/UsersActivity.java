@@ -1,4 +1,4 @@
-package com.example.tmmf5.onmyway;
+package com.example.tmmf5.onmyway.UserList;
 
 import android.app.Activity;
 import android.os.AsyncTask;
@@ -22,6 +22,8 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
+import com.example.tmmf5.onmyway.R;
+import com.example.tmmf5.onmyway.User;
 import com.example.tmmf5.onmyway.UserList.UserListAdapter;
 import com.example.tmmf5.onmyway.UserList.UserListClickListener;
 import com.example.tmmf5.onmyway.UserList.UsersTask;
@@ -143,7 +145,8 @@ public class UsersActivity extends AppCompatActivity {
             testUser.setFirst_name("Tiago");
             testUser.setLast_name("Ferreira");
             testUser.setGender("Male");
-            testUser.setPosition(new LatLng(41.182466, -8.598667));
+            testUser.setLatitude(41.182466f);
+            testUser.setLongitude(-8.598667f);
 
             ArrayList<User> myDataset = new ArrayList<>();
             myDataset.add(testUser);
@@ -151,7 +154,7 @@ public class UsersActivity extends AppCompatActivity {
             mAdapter = new UserListAdapter(myDataset, mRecyclerView, this.getActivity());
             mRecyclerView.setAdapter(mAdapter);
 
-            new UsersTask(this.getActivity()).execute();
+            new UsersTask(this.getActivity(), myDataset, mAdapter).execute();
 
             return rootView;
         }

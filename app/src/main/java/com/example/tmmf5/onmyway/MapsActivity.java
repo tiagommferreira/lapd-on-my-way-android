@@ -27,6 +27,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
+    private User mUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .addApi(LocationServices.API)
                     .addApi(AppIndex.API).build();
         }
+
+        mUser = (User) getIntent().getExtras().getSerializable("user");
     }
 
     @Override
@@ -148,16 +151,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()))      // Sets the center of the map to Mountain View
+                .target(new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()))
                 .zoom(17)                   // Sets the zoom
-                .bearing(90)                // Sets the orientation of the camera to east
-                .tilt(30)                   // Sets the tilt of the camera to 30 degrees
+                //.bearing(90)                // Sets the orientation of the camera to east
+                .tilt(20)                   // Sets the tilt of the camera to 30 degrees
                 .build();                   // Creates a CameraPosition from the builder
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
         mMap.setMyLocationEnabled(true);
 
-        LatLng toLocation = new LatLng(41.182466,-8.598667);
+        LatLng toLocation = new LatLng(mUser.getLatitude(),mUser.getLongitude());
         Object[] taskParams = {this, mMap, mLastLocation, toLocation};
         new DirectionsTask().execute(taskParams);
 

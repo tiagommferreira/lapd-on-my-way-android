@@ -1,13 +1,15 @@
 package com.example.tmmf5.onmyway;
 
-import com.google.android.gms.maps.model.LatLng;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     int id;
     String gender;
     String first_name;
     String last_name;
-    LatLng position;
+    float latitude;
+    float longitude;
 
     public User() {
 
@@ -19,14 +21,6 @@ public class User {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public LatLng getPosition() {
-        return position;
-    }
-
-    public void setPosition(LatLng position) {
-        this.position = position;
     }
 
     public String getLast_name() {
@@ -51,5 +45,21 @@ public class User {
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public float getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(float latitude) {
+        this.latitude = latitude;
+    }
+
+    public float getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(float longitude) {
+        this.longitude = longitude;
     }
 }
