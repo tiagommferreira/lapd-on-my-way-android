@@ -2,7 +2,6 @@ package com.example.tmmf5.onmyway.UserList;
 
 import android.util.Xml;
 
-import com.example.tmmf5.onmyway.User;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.xmlpull.v1.XmlPullParser;

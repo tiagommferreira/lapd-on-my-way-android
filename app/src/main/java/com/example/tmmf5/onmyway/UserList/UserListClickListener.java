@@ -3,12 +3,10 @@ package com.example.tmmf5.onmyway.UserList;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.example.tmmf5.onmyway.MapsActivity;
-import com.example.tmmf5.onmyway.User;
 
 import java.util.ArrayList;
 

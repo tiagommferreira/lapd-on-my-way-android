@@ -1,4 +1,4 @@
-package com.example.tmmf5.onmyway;
+package com.example.tmmf5.onmyway.UserList;
 
 
 import java.io.Serializable;

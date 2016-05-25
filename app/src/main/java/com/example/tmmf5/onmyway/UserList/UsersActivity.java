@@ -1,8 +1,7 @@
 package com.example.tmmf5.onmyway.UserList;
 
-import android.app.Activity;
-import android.os.AsyncTask;
 import android.support.design.widget.TabLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,28 +12,14 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import android.widget.TextView;
-
 import com.example.tmmf5.onmyway.R;
-import com.example.tmmf5.onmyway.User;
-import com.example.tmmf5.onmyway.UserList.UserListAdapter;
-import com.example.tmmf5.onmyway.UserList.UserListClickListener;
-import com.example.tmmf5.onmyway.UserList.UsersTask;
-import com.google.android.gms.maps.model.LatLng;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 
 public class UsersActivity extends AppCompatActivity {
@@ -111,6 +96,9 @@ public class UsersActivity extends AppCompatActivity {
         private RecyclerView mRecyclerView;
         private RecyclerView.Adapter mAdapter;
         private RecyclerView.LayoutManager mLayoutManager;
+        private SwipeRefreshLayout mSwipeRefreshLayout;
+
+        private ArrayList<User> myDataset;
 
         public PlaceholderFragment() {
         }
@@ -135,6 +123,14 @@ public class UsersActivity extends AppCompatActivity {
             //TextView textView = (TextView) rootView.findViewById(R.id.section_label);
             //textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
 
+            mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeLayout);
+            mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    refreshItems();
+                }
+            });
+
             mRecyclerView = (RecyclerView) rootView.findViewById(R.id.users_list);
 
             mLayoutManager = new LinearLayoutManager(this.getActivity());
@@ -148,15 +144,19 @@ public class UsersActivity extends AppCompatActivity {
             testUser.setLatitude(41.182466f);
             testUser.setLongitude(-8.598667f);
 
-            ArrayList<User> myDataset = new ArrayList<>();
+            myDataset = new ArrayList<>();
             myDataset.add(testUser);
 
             mAdapter = new UserListAdapter(myDataset, mRecyclerView, this.getActivity());
             mRecyclerView.setAdapter(mAdapter);
 
-            new UsersTask(this.getActivity(), myDataset, mAdapter).execute();
+            new UsersTask(this.getActivity(), myDataset, mAdapter, mSwipeRefreshLayout).execute();
 
             return rootView;
+        }
+
+        void refreshItems() {
+            new UsersTask(this.getActivity(), myDataset, mAdapter, mSwipeRefreshLayout).execute();
         }
     }
 

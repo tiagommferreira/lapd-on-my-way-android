@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.tmmf5.onmyway.R;
-import com.example.tmmf5.onmyway.User;
 
 import java.util.ArrayList;
 

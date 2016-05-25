@@ -2,10 +2,9 @@ package com.example.tmmf5.onmyway.UserList;
 
 import android.app.Activity;
 import android.os.AsyncTask;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-
-import com.example.tmmf5.onmyway.User;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -21,20 +20,25 @@ public class UsersTask extends AsyncTask<Void, Void, InputStream> {
     Activity parent;
     ArrayList<User> users;
     RecyclerView.Adapter adapter;
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
-    public UsersTask(Activity p, ArrayList<User> users, RecyclerView.Adapter mAdapter) {
+    public UsersTask(Activity p, ArrayList<User> users, RecyclerView.Adapter mAdapter, SwipeRefreshLayout mSwipeRefreshLayout) {
         this.parent = p;
         this.adapter = mAdapter;
         this.users = users;
+        this.mSwipeRefreshLayout = mSwipeRefreshLayout;
     }
 
     protected void onPreExecute() {
         //progressBar.setVisibility(View.VISIBLE);
         //responseTextView.setText("");
+        mSwipeRefreshLayout.setRefreshing(true);
+        Log.d("Task","Getting users");
     }
 
     @Override
     protected InputStream doInBackground(Void... params) {
+
 
         try {
             URL url = new URL("https://lapd-on-my-way.herokuapp.com/users");
@@ -68,9 +72,11 @@ public class UsersTask extends AsyncTask<Void, Void, InputStream> {
         if(response != null) {
             UsersXMLParser usersParser = new UsersXMLParser();
             try {
+                this.users.clear();
                 usersParser.parse(response, users);
                 Log.d("Users", String.valueOf(users));
                 this.adapter.notifyDataSetChanged();
+                mSwipeRefreshLayout.setRefreshing(false);
             } catch (XmlPullParserException e) {
                 e.printStackTrace();
             } catch (IOException e) {
