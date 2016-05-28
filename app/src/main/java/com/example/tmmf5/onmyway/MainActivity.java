@@ -15,13 +15,15 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
+import org.json.JSONObject;
+
 public class MainActivity extends AppCompatActivity {
 
-    ProgressBar progressBar;
-    TextView responseTextView;
     LoginButton loginButton;
 
     CallbackManager callbackManager;
@@ -36,36 +38,32 @@ public class MainActivity extends AppCompatActivity {
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
 
-        //progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        responseTextView = (TextView) findViewById(R.id.responseView);
-        //new UsersTask(this).execute();
-
         loginButton = (LoginButton) findViewById(R.id.login_button);
 
         if (loginButton != null) {
-            loginButton.setReadPermissions("email");
+            loginButton.setReadPermissions("email,user_friends");
 
             // Callback registration
             loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
                 @Override
                 public void onSuccess(LoginResult loginResult) {
-                    /*
+
                     GraphRequest request = GraphRequest.newMeRequest(
                             loginResult.getAccessToken(),
                             new GraphRequest.GraphJSONObjectCallback() {
                                 @Override
                                 public void onCompleted(JSONObject object, GraphResponse response) {
-                                    responseTextView.setText(object.toString());
+                                    Log.d("Facebook response", response.toString());
+                                    startUsersActivity();
                                 }
 
                             });
+
                     Bundle parameters = new Bundle();
-                    parameters.putString("fields", "id,name,link");
+                    parameters.putString("fields", "id,name,link,gender,first_name,last_name");
                     request.setParameters(parameters);
                     request.executeAsync();
-                    */
 
-                    startUsersActivity();
                 }
 
                 @Override

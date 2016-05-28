@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,6 +20,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.tmmf5.onmyway.R;
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
 
 import java.util.ArrayList;
 
@@ -145,12 +150,24 @@ public class UsersActivity extends AppCompatActivity {
             testUser.setLongitude(-8.598667f);
 
             myDataset = new ArrayList<>();
-            myDataset.add(testUser);
 
             mAdapter = new UserListAdapter(myDataset, mRecyclerView, this.getActivity());
             mRecyclerView.setAdapter(mAdapter);
 
             new UsersTask(this.getActivity(), myDataset, mAdapter, mSwipeRefreshLayout).execute();
+
+            //get facebook friends
+            new GraphRequest(
+                    AccessToken.getCurrentAccessToken(),
+                    "/me/friends",
+                    null,
+                    HttpMethod.GET,
+                    new GraphRequest.Callback() {
+                        public void onCompleted(GraphResponse response) {
+                            Log.d("Friends response", response.toString());
+                        }
+                    }
+            ).executeAsync();
 
             return rootView;
         }
