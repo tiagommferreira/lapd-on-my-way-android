@@ -19,12 +19,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.tmmf5.onmyway.APIListener;
+import com.example.tmmf5.onmyway.APITask;
 import com.example.tmmf5.onmyway.R;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
 
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class UsersActivity extends AppCompatActivity {
@@ -57,10 +63,14 @@ public class UsersActivity extends AppCompatActivity {
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        if (mViewPager != null) {
+            mViewPager.setAdapter(mSectionsPagerAdapter);
+        }
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mViewPager);
+        if (tabLayout != null) {
+            tabLayout.setupWithViewPager(mViewPager);
+        }
 
 
     }
@@ -125,8 +135,6 @@ public class UsersActivity extends AppCompatActivity {
                                  Bundle savedInstanceState) {
 
             View rootView = inflater.inflate(R.layout.fragment_users, container, false);
-            //TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            //textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
 
             mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeLayout);
             mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -154,7 +162,7 @@ public class UsersActivity extends AppCompatActivity {
             mAdapter = new UserListAdapter(myDataset, mRecyclerView, this.getActivity());
             mRecyclerView.setAdapter(mAdapter);
 
-            new UsersTask(this.getActivity(), myDataset, mAdapter, mSwipeRefreshLayout).execute();
+            getUsers();
 
             //get facebook friends
             new GraphRequest(
@@ -164,7 +172,7 @@ public class UsersActivity extends AppCompatActivity {
                     HttpMethod.GET,
                     new GraphRequest.Callback() {
                         public void onCompleted(GraphResponse response) {
-                            Log.d("Friends response", response.toString());
+                            Log.d("Friends response", String.valueOf(response.getJSONObject()));
                         }
                     }
             ).executeAsync();
@@ -173,7 +181,33 @@ public class UsersActivity extends AppCompatActivity {
         }
 
         void refreshItems() {
-            new UsersTask(this.getActivity(), myDataset, mAdapter, mSwipeRefreshLayout).execute();
+            getUsers();
+        }
+
+        void getUsers() {
+            new APITask("https://lapd-on-my-way.herokuapp.com/users", new APIListener() {
+                @Override
+                public void preRequest() {
+                    mSwipeRefreshLayout.setRefreshing(true);
+                    Log.d("Task","Getting users");
+                }
+
+                @Override
+                public void requestCompleted(InputStream response) {
+                    if(response != null) {
+                        UsersXMLParser usersParser = new UsersXMLParser();
+                        try {
+                            myDataset.clear();
+                            usersParser.parse(response, myDataset);
+                            Log.d("Users", String.valueOf(myDataset));
+                            mAdapter.notifyDataSetChanged();
+                            mSwipeRefreshLayout.setRefreshing(false);
+                        } catch (XmlPullParserException | IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }).execute();
         }
     }
 

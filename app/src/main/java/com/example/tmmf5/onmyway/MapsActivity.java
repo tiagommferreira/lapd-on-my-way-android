@@ -2,8 +2,10 @@ package com.example.tmmf5.onmyway;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
+import android.os.StrictMode;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -22,6 +24,16 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.PolyUtil;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
 
@@ -162,8 +174,54 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setMyLocationEnabled(true);
 
         LatLng toLocation = new LatLng(mUser.getLatitude(),mUser.getLongitude());
-        Object[] taskParams = {this, mMap, mLastLocation, toLocation};
-        new DirectionsTask().execute(taskParams);
+        //Object[] taskParams = {this, mMap, mLastLocation, toLocation};
+
+        String mapsUrl = "https://maps.googleapis.com/maps/api/directions/json?origin="+mLastLocation.getLatitude()+","+mLastLocation.getLongitude()+"&destination="+toLocation.latitude+","+toLocation.longitude+"&key=" + getResources().getString(R.string.directions_key);
+
+        new APITask(mapsUrl, new APIListener() {
+            @Override
+            public void preRequest() {
+                //mMap.clear();
+            }
+
+            @Override
+            public void requestCompleted(InputStream response) {
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                        .permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+
+                try {
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response));
+                    StringBuilder stringBuilder = new StringBuilder();
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        stringBuilder.append(line).append("\n");
+                    }
+                    bufferedReader.close();
+
+                    JSONObject json = null;
+
+                    json = new JSONObject(stringBuilder.toString());
+                    JSONObject route = (JSONObject) json.getJSONArray("routes").get(0);
+                    String polyline = route.getJSONObject("overview_polyline").getString("points");
+
+                    PolylineOptions options = new PolylineOptions();
+                    options.width(10);
+                    options.color(Color.BLUE);
+
+                    for(LatLng l : PolyUtil.decode(polyline)) {
+                        options.add(l);
+                    }
+
+                    mMap.addPolyline(options);
+
+
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }).execute();
 
     }
 

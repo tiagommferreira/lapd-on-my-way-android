@@ -18,6 +18,7 @@ import com.facebook.GraphResponse;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class LoginActivity extends AppCompatActivity {
@@ -50,7 +51,10 @@ public class LoginActivity extends AppCompatActivity {
                             new GraphRequest.GraphJSONObjectCallback() {
                                 @Override
                                 public void onCompleted(JSONObject object, GraphResponse response) {
-                                    Log.d("Facebook response", response.toString());
+
+                                    Log.d("Facebook response", String.valueOf(response.getJSONObject()));
+                                    //TODO: send this to the api /login route
+
                                     startUsersActivity();
                                     finish();
                                 }

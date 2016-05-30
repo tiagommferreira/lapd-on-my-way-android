@@ -65,7 +65,7 @@ public class UsersXMLParser {
     private User readUser(XmlPullParser parser) throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, ns, "user");
 
-        int id = 0;
+        int fb_id = 0;
         String gender = null;
         String first_name = null;
         String last_name = null;
@@ -76,24 +76,30 @@ public class UsersXMLParser {
                 continue;
             }
             String name = parser.getName();
-            if (name.equals("id")) {
-                id = readId(parser);
-            } else if (name.equals("gender")) {
-                gender = readGender(parser);
-            } else if (name.equals("first_name")) {
-                first_name = readFirstName(parser);
-            } else if (name.equals("last_name")) {
-                last_name = readLastName(parser);
-            } else if (name.equals("position")) {
-                position = readPosition(parser);
-            }
-            else {
-                skip(parser);
+            switch (name) {
+                case "fb_id":
+                    fb_id = readId(parser);
+                    break;
+                case "gender":
+                    gender = readGender(parser);
+                    break;
+                case "first_name":
+                    first_name = readFirstName(parser);
+                    break;
+                case "last_name":
+                    last_name = readLastName(parser);
+                    break;
+                case "position":
+                    position = readPosition(parser);
+                    break;
+                default:
+                    skip(parser);
+                    break;
             }
         }
 
         User user = new User();
-        user.setId(id);
+        user.setId(fb_id);
         user.setGender(gender);
         user.setFirst_name(first_name);
         user.setLast_name(last_name);
@@ -161,9 +167,9 @@ public class UsersXMLParser {
     }
 
     private int readId(XmlPullParser parser) throws IOException, XmlPullParserException {
-        parser.require(XmlPullParser.START_TAG, ns, "id");
+        parser.require(XmlPullParser.START_TAG, ns, "fb_id");
         String id = readText(parser);
-        parser.require(XmlPullParser.END_TAG, ns, "id");
+        parser.require(XmlPullParser.END_TAG, ns, "fb_id");
         return Integer.parseInt(id);
     }
 
