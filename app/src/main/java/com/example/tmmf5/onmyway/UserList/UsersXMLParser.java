@@ -1,5 +1,6 @@
 package com.example.tmmf5.onmyway.UserList;
 
+import android.util.Log;
 import android.util.Xml;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -28,7 +29,6 @@ public class UsersXMLParser {
 
     private void readUsers(XmlPullParser parser, ArrayList<User> users) throws XmlPullParserException, IOException {
 
-
         parser.require(XmlPullParser.START_TAG, ns, "users");
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -37,6 +37,7 @@ public class UsersXMLParser {
             String name = parser.getName();
             // Starts by looking for the user tag
             if (name.equals("user")) {
+                Log.d("XMLParser", "Found User");
                 users.add(readUser(parser));
             } else {
                 skip(parser);
@@ -124,6 +125,7 @@ public class UsersXMLParser {
 
                 if(parser.getName().equals("longitude")) {
                     longitude = readLongitude(parser);
+                    parser.nextTag();
                 }
             }
         }

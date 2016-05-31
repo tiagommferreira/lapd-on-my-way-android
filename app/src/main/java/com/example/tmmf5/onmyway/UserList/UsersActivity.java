@@ -199,7 +199,6 @@ public class UsersActivity extends AppCompatActivity {
                         try {
                             myDataset.clear();
                             usersParser.parse(response, myDataset);
-                            Log.d("Users", String.valueOf(myDataset));
                             mAdapter.notifyDataSetChanged();
                             mSwipeRefreshLayout.setRefreshing(false);
                         } catch (XmlPullParserException | IOException e) {
