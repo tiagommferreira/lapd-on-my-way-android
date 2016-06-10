@@ -27,11 +27,17 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 
 public class UsersActivity extends AppCompatActivity {
 
@@ -149,33 +155,12 @@ public class UsersActivity extends AppCompatActivity {
             mLayoutManager = new LinearLayoutManager(this.getActivity());
             mRecyclerView.setLayoutManager(mLayoutManager);
 
-            User testUser = new User();
-            testUser.setId(1);
-            testUser.setFirst_name("Tiago");
-            testUser.setLast_name("Ferreira");
-            testUser.setGender("Male");
-            testUser.setLatitude(41.182466f);
-            testUser.setLongitude(-8.598667f);
-
             myDataset = new ArrayList<>();
 
-            mAdapter = new UserListAdapter(myDataset, mRecyclerView, this.getActivity());
+            mAdapter = new UserListAdapter(myDataset, mRecyclerView, this.getActivity(), this.getArguments().get(ARG_SECTION_NUMBER));
             mRecyclerView.setAdapter(mAdapter);
 
             getUsers();
-
-            //get facebook friends
-            new GraphRequest(
-                    AccessToken.getCurrentAccessToken(),
-                    "/me/friends",
-                    null,
-                    HttpMethod.GET,
-                    new GraphRequest.Callback() {
-                        public void onCompleted(GraphResponse response) {
-                            Log.d("Friends response", String.valueOf(response.getJSONObject()));
-                        }
-                    }
-            ).executeAsync();
 
             return rootView;
         }
@@ -199,8 +184,48 @@ public class UsersActivity extends AppCompatActivity {
                         try {
                             myDataset.clear();
                             usersParser.parse(response, myDataset);
-                            mAdapter.notifyDataSetChanged();
-                            mSwipeRefreshLayout.setRefreshing(false);
+
+                            if(getArguments().get(ARG_SECTION_NUMBER).equals(2)) {
+                                //get facebook friends
+                                new GraphRequest(
+                                        AccessToken.getCurrentAccessToken(),
+                                        "/me/friends",
+                                        null,
+                                        HttpMethod.GET,
+                                        new GraphRequest.Callback() {
+                                            public void onCompleted(GraphResponse response) {
+                                                Log.d("Friends response", String.valueOf(response.getJSONObject()));
+
+                                                ArrayList<Long> friendIds = new ArrayList<Long>();
+
+                                                try {
+                                                    JSONArray friends =  response.getJSONObject().getJSONArray("data");
+                                                    for(int i = 0; i < friends.length(); i++) {
+                                                        friendIds.add(friends.getJSONObject(i).getLong("id"));
+                                                    }
+                                                } catch (JSONException e) {
+                                                    e.printStackTrace();
+                                                }
+
+                                                for (Iterator<User> iterator = myDataset.iterator(); iterator.hasNext();) {
+                                                    User u = iterator.next();
+
+                                                    if(!friendIds.contains(u.getId())) {
+                                                        iterator.remove();
+                                                    }
+                                                }
+
+                                                mAdapter.notifyDataSetChanged();
+                                                mSwipeRefreshLayout.setRefreshing(false);
+                                            }
+                                        }
+                                ).executeAsync();
+                            }
+                            else {
+                                mAdapter.notifyDataSetChanged();
+                                mSwipeRefreshLayout.setRefreshing(false);
+                            }
+
                         } catch (XmlPullParserException | IOException e) {
                             e.printStackTrace();
                         }

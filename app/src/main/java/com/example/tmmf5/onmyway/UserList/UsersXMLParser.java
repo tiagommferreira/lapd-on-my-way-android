@@ -66,7 +66,7 @@ public class UsersXMLParser {
     private User readUser(XmlPullParser parser) throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, ns, "user");
 
-        int fb_id = 0;
+        long fb_id = 0;
         String gender = null;
         String first_name = null;
         String last_name = null;
@@ -168,11 +168,11 @@ public class UsersXMLParser {
         return gender;
     }
 
-    private int readId(XmlPullParser parser) throws IOException, XmlPullParserException {
+    private long readId(XmlPullParser parser) throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, ns, "fb_id");
         String id = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, "fb_id");
-        return Integer.parseInt(id);
+        return Long.parseLong(id);
     }
 
     private String readText(XmlPullParser parser) throws IOException, XmlPullParserException {

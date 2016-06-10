@@ -4,7 +4,7 @@ package com.example.tmmf5.onmyway.UserList;
 import java.io.Serializable;
 
 public class User implements Serializable {
-    int id;
+    long id;
     String gender;
     String first_name;
     String last_name;
@@ -15,11 +15,11 @@ public class User implements Serializable {
 
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

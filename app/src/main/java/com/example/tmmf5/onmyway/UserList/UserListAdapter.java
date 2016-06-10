@@ -15,6 +15,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
     private ArrayList<User> mDataset;
     private RecyclerView parentRV;
     private Activity parentActivity;
+    private int tab;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -30,10 +31,11 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public UserListAdapter(ArrayList<User> myDataset, RecyclerView mRecyclerView, Activity parentActivity) {
+    public UserListAdapter(ArrayList<User> myDataset, RecyclerView mRecyclerView, Activity parentActivity, Object o) {
         mDataset = myDataset;
         parentRV = mRecyclerView;
         this.parentActivity = parentActivity;
+        this.tab = (int) o;
     }
 
     // Create new views (invoked by the layout manager)
@@ -41,7 +43,9 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
     public UserListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_layout, parent, false);
-        v.setOnClickListener(new UserListClickListener(this.parentRV,mDataset,parentActivity));
+
+        if(tab == 2)
+            v.setOnClickListener(new UserListClickListener(this.parentRV,mDataset,parentActivity));
 
         ViewHolder vh = new ViewHolder(v);
         return vh;
