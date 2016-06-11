@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import com.example.tmmf5.onmyway.UserList.UsersActivity;
 import com.facebook.AccessToken;
+import com.facebook.login.LoginManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         if (AccessToken.getCurrentAccessToken() != null) {
             new Handler().postDelayed(new Runnable() {

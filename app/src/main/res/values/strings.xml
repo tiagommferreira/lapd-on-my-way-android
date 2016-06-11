@@ -6,4 +6,5 @@
     <string name="title_activity_users">UsersActivity</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="directions_key">AIzaSyDmSmo4T102wMxzVqRjuycwXUYuprOYvis</string>
+    <string name="places_key">AIzaSyCRXQTWl9nOJytcq4mtzOX7dVG7ACXcuHU</string>
 </resources>

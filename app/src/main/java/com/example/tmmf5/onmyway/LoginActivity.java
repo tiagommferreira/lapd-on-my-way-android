@@ -17,14 +17,18 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.InputStream;
 
 public class LoginActivity extends AppCompatActivity {
 
     LoginButton loginButton;
     CallbackManager callbackManager;
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,10 +57,42 @@ public class LoginActivity extends AppCompatActivity {
                                 public void onCompleted(JSONObject object, GraphResponse response) {
 
                                     Log.d("Facebook response", String.valueOf(response.getJSONObject()));
-                                    //TODO: send this to the api /login route
 
-                                    startUsersActivity();
-                                    finish();
+                                    JSONObject responseObject = response.getJSONObject();
+
+                                    JSONObject body = new JSONObject();
+
+                                    JSONObject position = new JSONObject();
+
+                                    try {
+                                        position.put("latitude", 41.182466);
+                                        position.put("longitude", -8.598667);
+
+                                        AppStatics.FB_ID = responseObject.getLong("id");
+                                        body.put("id",responseObject.getLong("id"));
+                                        body.put("first_name",responseObject.getString("first_name"));
+                                        body.put("last_name",responseObject.getString("last_name"));
+                                        body.put("gender",responseObject.getString("gender"));
+                                        body.put("position", position);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    new APIPostTask("https://lapd-on-my-way.herokuapp.com/login", body, new APIListener() {
+                                        @Override
+                                        public void preRequest() {
+
+                                        }
+
+                                        @Override
+                                        public void requestCompleted(InputStream response) {
+                                            if(response != null) {
+                                                startUsersActivity();
+                                                finish();
+                                            }
+                                        }
+                                    }).execute();
+
                                 }
 
                             });
